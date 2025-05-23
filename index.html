@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="bn"> <!-- Default language, i18n.js might change this -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title data-translate="appTitle">আমার হিসাব</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+</head>
+<body>
+    <div id="loadingIndicator" class="hidden"> <!-- Initially hidden -->
+        <i class="fas fa-spinner fa-spin"></i>  <span data-translate="loading">লোড হচ্ছে...</span>
+    </div>
+
+    <div id="loginScreen"> <!-- Initially shown -->
+        <h1 data-translate="appTitle"><i class="fas fa-wallet"></i> আমার হিসাব</h1>
+        <p style="margin-bottom: 20px; font-size: 1.1em; color: #343a40;" data-translate="loginPrompt">আপনার আর্থিক হিসাব সহজে পরিচালনা করতে লগইন করুন।</p>
+        <button id="googleLoginBtn" class="login-btn">
+            <i class="fab fa-google"></i> <span data-translate="loginWithGoogle">Google দিয়ে লগইন করুন</span>
+        </button>
+    </div>
+
+    <div class="app-container logged-out"> <!-- Initially hidden by 'logged-out' class -->
+        <header class="app-header">
+            <div class="header-title-section">
+                <h1 data-translate="appTitle"><i class="fas fa-wallet"></i> আমার হিসাব</h1>
+                 <div id="userInfo" style="display: none;"> <!-- Controlled by JS -->
+                    <img id="userPhoto" src="images/placeholder_user_icon.png" alt="User">
+                    <span id="userName"></span>
+                    <button id="logoutButton"><i class="fas fa-sign-out-alt"></i> <span data-translate="logout">লগআউট</span></button>
+                </div>
+            </div>
+            <div class="language-toggle-container">
+                <button id="languageToggleBtn" class="language-toggle-btn">English</button> <!-- Text updated by i18n.js -->
+            </div>
+            <div id="liveClock" class="live-clock">
+                <i class="far fa-clock"></i> <span id="clockTime">00:00:00 AM</span>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <nav class="tabs services-nav">
+                <button class="tab-button service-button active" onclick="openTab(event, 'dashboard')"><i class="fas fa-tachometer-alt"></i><span data-translate="dashboard">ড্যাশবোর্ড</span></button>
+                <button class="tab-button service-button" onclick="openTab(event, 'addEntry')"><i class="fas fa-plus-circle"></i><span data-translate="newEntry">নতুন এন্ট্রি</span></button>
+                <button class="tab-button service-button" onclick="openTab(event, 'transactions')"><i class="fas fa-list-alt"></i><span data-translate="allTransactions">সকল লেনদেন</span></button>
+                <button class="tab-button service-button" onclick="openTab(event, 'expenseReport')"><i class="fas fa-chart-bar"></i><span data-translate="expenseReport">খরচ রিপোর্ট</span></button>
+                <button class="tab-button service-button" onclick="openTab(event, 'expenseCategoriesView')"><i class="fas fa-stream"></i><span data-translate="expenseCategories">খরচের খাত</span></button>
+                <button class="tab-button service-button" onclick="openTab(event, 'denaPaona')"><i class="fas fa-hand-holding-usd"></i><span data-translate="debtsReceivables">দেনা-পাওনা</span></button>
+            </nav>
+
+            <!-- ড্যাশবোর্ড ট্যাব -->
+            <div id="dashboard" class="tab-content active">
+                <div class="dashboard-header">
+                    <h2 data-translate="dashboard"><i class="fas fa-chart-pie"></i> ড্যাশবোর্ড</h2>
+                </div>
+                <div class="dashboard-filters">
+                    <div class="filter-group">
+                        <label for="dashboardMonthFilter"><i class="fas fa-calendar-alt"></i> <span data-translate="selectMonth">মাস নির্বাচন করুন:</span></label>
+                        <input type="month" id="dashboardMonthFilter" onchange="updateDashboardSummary()">
+                    </div>
+                    <div class="filter-group date-range-group">
+                        <div>
+                            <label for="dashboardStartDateFilter"><i class="fas fa-calendar-day"></i> <span data-translate="startDate">শুরুর তারিখ:</span></label>
+                            <input type="date" id="dashboardStartDateFilter" onchange="updateDashboardSummary()">
+                        </div>
+                        <div>
+                            <label for="dashboardEndDateFilter"><i class="fas fa-calendar-day"></i> <span data-translate="endDate">শেষের তারিখ:</span></label>
+                            <input type="date" id="dashboardEndDateFilter" onchange="updateDashboardSummary()">
+                        </div>
+                    </div>
+                     <button class="btn btn-small" onclick="resetDashboardFilters()"><i class="fas fa-undo"></i> <span data-translate="resetFilters">ফিল্টার রিসেট</span></button>
+                </div>
+                <div class="summary-period-info">
+                    <p><span data-translate="showingAccountsFor">হিসাব দেখানো হচ্ছে:</span> <strong id="summaryPeriodText" data-translate="currentMonth">চলতি মাস</strong></p>
+                </div>
+                <div class="summary">
+                    <div class="summary-box income-summary">
+                        <h3><i class="fas fa-arrow-down"></i> <span data-translate="totalIncome">মোট আয়</span></h3>
+                        <p id="totalIncomeDisplay">৳ ০.০০</p>
+                    </div>
+                    <div class="summary-box expense-summary">
+                        <h3><i class="fas fa-arrow-up"></i> <span data-translate="totalExpense">মোট ব্যয়</span></h3>
+                        <p id="totalExpenseDisplay">৳ ০.০০</p>
+                    </div>
+                    <div class="summary-box balance-summary">
+                        <h3><i class="fas fa-balance-scale"></i> <span data-translate="currentBalance">বর্তমান ব্যালেন্স</span></h3>
+                        <p id="currentBalanceDisplay">৳ ০.০০</p>
+                    </div>
+                </div>
+                 <div class="summary loan-summary-group">
+                    <div class="summary-box lent-summary">
+                        <h3><i class="fas fa-handshake-angle"></i> <span data-translate="totalReceivableAllTime">মোট পাওনা (সকল সময়)</span></h3>
+                        <p id="totalLentDisplay">৳ ০.০০</p>
+                    </div>
+                    <div class="summary-box borrowed-summary">
+                        <h3><i class="fas fa-people-arrows"></i> <span data-translate="totalDebtAllTime">মোট দেনা (সকল সময়)</span></h3>
+                        <p id="totalBorrowedDisplay">৳ ০.০০</p>
+                    </div>
+                    <div class="summary-box net-loan-summary">
+                        <h3><i class="fas fa-file-invoice-dollar"></i> <span data-translate="debtReceivableBalance">দেনা-পাওনা ব্যালেন্স</span></h3>
+                        <p id="netLoanBalanceDisplay">৳ ০.০০</p>
+                    </div>
+                </div>
+                <div class="summary final-balance-group">
+                     <div class="summary-box final-balance-summary">
+                        <h3><i class="fas fa-check-double"></i> <span data-translate="balanceAfterDebts">দেনা পরিশোধের পর ব্যালেন্স</span></h3>
+                        <p id="finalBalanceAfterLoansDisplay">৳ ০.০০</p>
+                    </div>
+                </div>
+                <h3 class="section-title" data-translate="latestTransactionsAllTime"><i class="fas fa-history"></i> সর্বশেষ লেনদেন (সকল সময়)</h3>
+                <div id="latestTwoTransactions" class="transaction-list compact-list">
+                    <p data-translate="noRecentTransactions">কোনো সাম্প্রতিক লেনদেন নেই।</p>
+                </div>
+                <button class="btn btn-secondary" onclick="openTab(null, 'transactions')">
+                    <i class="fas fa-ellipsis-h"></i> <span data-translate="viewAllTransactions">সকল লেনদেন দেখুন</span>
+                </button>
+            </div>
+
+            <!-- নতুন এন্ট্রি ট্যাব (একীভূত) -->
+            <div id="addEntry" class="tab-content">
+                <h2><i class="fas fa-edit"></i> <span id="unifiedEntryFormTitle" data-translate="formTitle_newEntry">নতুন এন্ট্রি</span></h2>
+                <form id="unifiedEntryForm">
+                    <input type="hidden" id="editingUnifiedEntryId" value="">
+                    <input type="hidden" id="editingUnifiedEntryClass" value="">
+                    <input type="hidden" id="editingFirestoreDocId" value="">
+
+                    <div class="form-group">
+                        <label for="unifiedEntryType"><i class="fas fa-tags"></i> <span data-translate="entryType">এন্ট্রির ধরণ:</span></label>
+                        <select id="unifiedEntryType" name="unifiedEntryType" onchange="toggleUnifiedEntryFields()">
+                            <option value="expense" data-translate="expense">ব্যয়</option>
+                            <option value="income" data-translate="income">আয়</option>
+                            <option value="loan" data-translate="loan">দেনা/পাওনা</option>
+                        </select>
+                    </div>
+
+                    <div id="transactionSpecificFields">
+                        <div id="incomeFields" style="display: none;">
+                            <div class="form-group">
+                                <label for="incomeSource"><i class="fas fa-sign-in-alt"></i> <span data-translate="incomeSourceLabel">উৎস:</span></label>
+                                <input type="text" id="incomeSource" name="incomeSource" placeholder_translate_key="incomeSourcePlaceholder">
+                            </div>
+                        </div>
+                        <div id="expenseFields">
+                            <div class="form-group">
+                                <label for="expenseCategory"><i class="fas fa-sitemap"></i> <span data-translate="expenseCategoryLabel">খরচের প্রধান খাত:</span></label>
+                                <select id="expenseCategory" name="expenseCategory" onchange="updateSubcategories(this.value, 'expenseSubcategory')">
+                                    <option value="" data-translate="selectCategory">-- খাত নির্বাচন করুন --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseSubcategory"><i class="fas fa-grip-horizontal"></i> <span data-translate="expenseSubcategoryLabel">খরচের উপখাত:</span></label>
+                                <select id="expenseSubcategory" name="expenseSubcategory">
+                                    <option value="" data-translate="selectSubcategory">-- উপখাত নির্বাচন করুন --</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="loanSpecificFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="loanType"><i class="fas fa-retweet"></i> <span data-translate="loanTypeLabel">দেনা/পাওনার ধরণ:</span></label>
+                            <select id="loanType" name="loanType">
+                                <option value="lent" data-translate="loanTypeLent">পাওনা (কাউকে দিয়েছি)</option>
+                                <option value="borrowed" data-translate="loanTypeBorrowed">দেনা (কারো থেকে নিয়েছি)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="personName"><i class="fas fa-user"></i> <span data-translate="personNameLabel">ব্যক্তির নাম:</span></label>
+                            <input type="text" id="personName" name="personName" placeholder_translate_key="personNamePlaceholder">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="unifiedAmount"><i class="fas fa-coins"></i> <span data-translate="amountLabel">পরিমাণ (৳):</span></label>
+                        <input type="number" id="unifiedAmount" name="unifiedAmount" placeholder="0.00" required step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="unifiedDateTime"><i class="far fa-calendar-alt"></i> <span data-translate="dateTimeLabel">তারিখ ও সময়:</span></label>
+                        <input type="datetime-local" id="unifiedDateTime" name="unifiedDateTime" required step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="unifiedNotes"><i class="far fa-sticky-note"></i> <span data-translate="notesLabel">নোট (ঐচ্ছিক):</span></label>
+                        <textarea id="unifiedNotes" name="unifiedNotes" rows="3" placeholder_translate_key="notesPlaceholder"></textarea>
+                    </div>
+                    <button type="submit" class="btn" id="submitUnifiedEntryBtn"><i class="fas fa-check-circle"></i> <span data-translate="addEntryButton">এন্ট্রি যোগ করুন</span></button>
+                </form>
+            </div>
+
+            <!-- সকল লেনদেন ট্যাব -->
+            <div id="transactions" class="tab-content">
+                <h2 data-translate="allTransactions"><i class="fas fa-receipt"></i> সকল লেনদেন (আয়/ব্যয়)</h2>
+                 <div class="filter-section">
+                    <label for="transactionFilter"><i class="fas fa-filter"></i> <span data-translate="filterBy">ফিল্টার করুন:</span></label>
+                    <select id="transactionFilter" onchange="filterTransactions()">
+                        <option value="all" data-translate="all">সব</option>
+                        <option value="income" data-translate="income">আয়</option>
+                        <option value="expense" data-translate="expense">ব্যয়</option>
+                    </select>
+                    <input type="month" id="monthFilter" onchange="filterTransactions()">
+                    <input type="text" id="textSearchFilter" placeholder_translate_key="searchInDescription" oninput="filterTransactions()">
+                </div>
+                <div id="allTransactionsList" class="transaction-list">
+                    <p data-translate="noTransactionsAdded">এখনো কোনো লেনদেন যোগ করা হয়নি।</p>
+                </div>
+            </div>
+
+            <!-- খরচ রিপোর্ট ট্যাব -->
+            <div id="expenseReport" class="tab-content">
+                <h2 data-translate="expenseReport"><i class="fas fa-file-invoice-dollar"></i> খরচ রিপোর্ট</h2>
+                <div class="dashboard-filters">
+                    <div class="filter-group">
+                        <label for="reportMonthFilter"><i class="fas fa-calendar-alt"></i> <span data-translate="selectMonth">মাস নির্বাচন করুন:</span></label>
+                        <input type="month" id="reportMonthFilter" onchange="renderExpenseReport()">
+                    </div>
+                    <div class="filter-group date-range-group">
+                        <div>
+                            <label for="reportStartDateFilter"><i class="fas fa-calendar-day"></i> <span data-translate="startDate">শুরুর তারিখ:</span></label>
+                            <input type="date" id="reportStartDateFilter" onchange="renderExpenseReport()">
+                        </div>
+                        <div>
+                            <label for="reportEndDateFilter"><i class="fas fa-calendar-day"></i> <span data-translate="endDate">শেষের তারিখ:</span></label>
+                            <input type="date" id="reportEndDateFilter" onchange="renderExpenseReport()">
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label for="reportCategoryFilter"><i class="fas fa-sitemap"></i> <span data-translate="mainCategory">প্রধান খাত:</span></label>
+                        <select id="reportCategoryFilter" onchange="updateReportSubcategoryFilter(); renderExpenseReport();">
+                            <option value="all" data-translate="allMainCategories">সকল প্রধান খাত</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="reportSubcategoryFilter"><i class="fas fa-grip-horizontal"></i> <span data-translate="subcategory">উপখাত:</span></label>
+                        <select id="reportSubcategoryFilter" onchange="renderExpenseReport()" disabled>
+                            <option value="all" data-translate="allSubcategories">সকল উপখাত</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-small" onclick="resetExpenseReportFilters()"><i class="fas fa-undo"></i> <span data-translate="resetFilters">ফিল্টার রিসেট</span></button>
+                </div>
+                <div class="summary-period-info">
+                    <p><span data-translate="reportForPeriod">রিপোর্ট দেখানো হচ্ছে:</span> <strong id="reportSummaryPeriodText" data-translate="currentMonth">চলতি মাস</strong></p>
+                </div>
+                <div id="expenseReportContainer" class="expense-report-view">
+                </div>
+                <div class="report-grand-total">
+                    <h4><i class="fas fa-calculator"></i> <span data-translate="totalExpenseSelectedFilter">মোট খরচ (নির্বাচিত ফিল্টার):</span> <strong id="reportGrandTotalAmount">৳ ০.০০</strong></h4>
+                </div>
+            </div>
+
+            <!-- খরচের খাত ট্যাব -->
+            <div id="expenseCategoriesView" class="tab-content">
+                <h2 data-translate="manualCategoryList"><i class="fas fa-tags"></i> খরচের খাতসমূহ (ম্যানুয়াল তালিকা)</h2>
+                <div id="expenseCategoriesListContainer" class="categories-list-container"></div>
+            </div>
+
+            <!-- দেনা-পাওনা ট্যাব -->
+            <div id="denaPaona" class="tab-content">
+                <h2 data-translate="loanSummaryAndList"><i class="fas fa-balance-scale-left"></i> দেনা-পাওনা সারাংশ ও তালিকা</h2>
+                <div class="dashboard-filters">
+                    <div class="filter-group">
+                        <label for="denaPaonaMonthFilter"><i class="fas fa-calendar-alt"></i> <span data-translate="selectMonth">মাস নির্বাচন করুন:</span></label>
+                        <input type="month" id="denaPaonaMonthFilter" onchange="renderDenaPaonaTab()">
+                    </div>
+                    <div class="filter-group date-range-group">
+                        <div>
+                            <label for="denaPaonaStartDateFilter"><i class="fas fa-calendar-day"></i> <span data-translate="startDate">শুরুর তারিখ:</span></label>
+                            <input type="date" id="denaPaonaStartDateFilter" onchange="renderDenaPaonaTab()">
+                        </div>
+                        <div>
+                            <label for="denaPaonaEndDateFilter"><i class="fas fa-calendar-day"></i> <span data-translate="endDate">শেষের তারিখ:</span></label>
+                            <input type="date" id="denaPaonaEndDateFilter" onchange="renderDenaPaonaTab()">
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label for="denaPaonaTypeFilter"><i class="fas fa-filter"></i> <span data-translate="loanTypeFilter">ধরণ:</span></label>
+                        <select id="denaPaonaTypeFilter" onchange="renderDenaPaonaTab()">
+                            <option value="all" data-translate="allDebtsReceivables">সব দেনা-পাওনা</option>
+                            <option value="lent" data-translate="onlyReceivables">শুধু পাওনা</option>
+                            <option value="borrowed" data-translate="onlyDebts">শুধু দেনা</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-small" onclick="resetDenaPaonaFilters()"><i class="fas fa-undo"></i> <span data-translate="resetFilters">ফিল্টার রিসেট</span></button>
+                </div>
+                <div class="summary-period-info">
+                    <p><span data-translate="showingAccountsFor">হিসাব দেখানো হচ্ছে:</span> <strong id="denaPaonaSummaryPeriodText" data-translate="currentMonth">চলতি মাস</strong></p>
+                </div>
+                <div class="summary">
+                    <div class="summary-box lent-summary">
+                        <h3><i class="fas fa-handshake-angle"></i> <span data-translate="totalReceivableSelectedTime">মোট পাওনা (নির্বাচিত সময়)</span></h3>
+                        <p id="denaPaonaTotalLentDisplay">৳ ০.০০</p>
+                    </div>
+                    <div class="summary-box borrowed-summary">
+                        <h3><i class="fas fa-people-arrows"></i> <span data-translate="totalDebtSelectedTime">মোট দেনা (নির্বাচিত সময়)</span></h3>
+                        <p id="denaPaonaTotalBorrowedDisplay">৳ ০.০০</p>
+                    </div>
+                    <div class="summary-box net-loan-summary">
+                        <h3><i class="fas fa-file-invoice-dollar"></i> <span data-translate="netDebtReceivableSelectedTime">নেট দেনা-পাওনা (নির্বাচিত সময়)</span></h3>
+                        <p id="denaPaonaNetBalanceDisplay">৳ ০.০০</p>
+                    </div>
+                </div>
+                <h3 class="section-title" data-translate="loanListSelectedTime"><i class="fas fa-list-ul"></i> দেনা-পাওনার তালিকা (নির্বাচিত সময়)</h3>
+                <div id="denaPaonaListContainer" class="transaction-list">
+                    <p data-translate="noLoansForFilter">এই ফিল্টারে কোনো দেনা-পাওনা নেই।</p>
+                </div>
+                 <button class="btn btn-primary" onclick="openTab(null, 'addEntry'); document.getElementById('unifiedEntryType').value='loan'; toggleUnifiedEntryFields();">
+                    <i class="fas fa-plus-circle"></i> <span data-translate="addNewLoanButton">নতুন দেনা/পাওনা যোগ করুন</span>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <div id="customNotification" class="notification"><p id="notificationMessage"></p></div>
+    <button id="calculatorToggleBtn" class="calculator-toggle-btn"><i class="fas fa-calculator"></i></button>
+
+    <div id="calculatorOverlay" class="calculator-overlay">
+        <div class="calculator-fullscreen">
+            <div class="calculator-header-fs">
+                <button id="calculatorCloseBtnFS" class="calculator-close-btn-fs"><i class="fas fa-times"></i></button>
+                <span data-translate="calculator">ক্যালকুলেটর</span>
+            </div>
+            <div class="calculator-display-area">
+                <div id="calcHistoryDisplayFS" class="calc-history-fs"></div>
+                <div id="calcInputExpressionDisplayFS" class="calc-input-expression-fs" dir="ltr">0</div>
+                <div id="calcLivePreviewDisplayFS" class="calc-live-preview-fs" dir="ltr"></div>
+                <div id="calcResultDisplayFS" class="calc-result-display-fs" dir="ltr"></div>
+            </div>
+            <div class="calculator-buttons-fs">
+                <button class="calc-btn-fs function" data-value="clear">AC</button><button class="calc-btn-fs function" data-value="backspace"><i class="fas fa-delete-left"></i></button><button class="calc-btn-fs operator" data-value="%">%</button><button class="calc-btn-fs operator" data-value="/">÷</button>
+                <button class="calc-btn-fs number" data-value="7">7</button><button class="calc-btn-fs number" data-value="8">8</button><button class="calc-btn-fs number" data-value="9">9</button><button class="calc-btn-fs operator" data-value="*">×</button>
+                <button class="calc-btn-fs number" data-value="4">4</button><button class="calc-btn-fs number" data-value="5">5</button><button class="calc-btn-fs number" data-value="6">6</button><button class="calc-btn-fs operator" data-value="-">-</button>
+                <button class="calc-btn-fs number" data-value="1">1</button><button class="calc-btn-fs number" data-value="2">2</button><button class="calc-btn-fs number" data-value="3">3</button><button class="calc-btn-fs operator" data-value="+">+</button>
+                <button class="calc-btn-fs number zero-btn" data-value="0">0</button><button class="calc-btn-fs number" data-value=".">.</button><button class="calc-btn-fs equals" data-value="=">=</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs - Order is important for older versions -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- Custom Scripts - Order matters -->
+    <script src="firebase-init.js"></script> <!-- Firebase Config and Init -->
+    <script src="i18n.js"></script>         <!-- Internationalization Logic -->
+    <script src="script.js"></script>      <!-- Main Application Logic -->
+
+</body>
+</html>
