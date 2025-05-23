@@ -6,20 +6,48 @@ body { font-family: 'Hind Siliguri', -apple-system, BlinkMacSystemFont, 'Segoe U
 
 /* App Header */
 .app-header { background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 7px rgba(0,0,0,0.15); position: sticky; top: 0; z-index: 900; }
-.app-header h1 { font-size: 1.7em; font-weight: 600; }
+.app-header h1 { font-size: 1.7em; font-weight: 600; margin-right: auto; /* Pushes other items to the right */ }
 .app-header h1 i { margin-right: 10px; }
+
+.header-user-info { /* New class for user info and logout */
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Gap between name, clock, and logout */
+}
+#userDisplayName {
+    font-weight: 500;
+    color: white;
+    font-size: 0.95em;
+    white-space: nowrap; /* Prevent name from wrapping */
+}
 .live-clock {
     font-family: 'Roboto Mono', monospace; 
-    font-size: 1.2em; 
+    font-size: 1.1em; /* Slightly smaller to fit */
     background-color: rgba(255,255,255,0.25);
-    padding: 8px 15px;
-    border-radius: 25px;
+    padding: 7px 12px; /* Adjusted padding */
+    border-radius: 20px;
     font-weight: 600; 
-    letter-spacing: 1px; 
-    min-width: 160px; 
+    letter-spacing: 0.5px; 
+    min-width: 140px; /* Adjusted min-width */
     text-align: center;
 }
-.live-clock i { margin-right: 8px; }
+.live-clock i { margin-right: 6px; }
+
+#logoutButton.btn.btn-small {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 9px 14px; /* Adjusted padding */
+    font-size: 0.88em; /* Adjusted font size */
+    line-height: 1.2;
+    border-radius: 8px; /* Consistent radius */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+#logoutButton.btn.btn-small:hover {
+    background-color: #c0392b;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
 
 .app-main { padding: 20px; }
 /* Service Navigation Buttons (Tabs) */
@@ -283,7 +311,20 @@ hr.section-divider {
 
 /* Responsive Adjustments */
 @media (max-width: 768px) { 
-    .app-header h1 { font-size: 1.5em; } 
+    .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 15px;
+    }
+    .app-header h1 { font-size: 1.4em; margin-bottom: 8px; } 
+    .header-user-info {
+        width: 100%;
+        justify-content: space-between; /* Distribute items in user info bar */
+    }
+    #userDisplayName { font-size: 0.9em; }
+    .live-clock { font-size: 1em; padding: 6px 10px; min-width: auto; flex-grow: 1; text-align: center; margin-left: 0 !important; }
+    #logoutButton.btn.btn-small { font-size: 0.8em; padding: 7px 10px; }
+
     .service-button { padding: 12px 8px; font-size: 0.8em; } 
     .service-button i {font-size: 1.5em;}
     .calc-btn-fs { padding: 16px 0; font-size: 1.3em; } 
@@ -292,7 +333,7 @@ hr.section-divider {
     .calc-result-display-fs { font-size: 1.4em; height: 30px; line-height: 30px; min-height: 30px; } 
     .dashboard-filters { flex-direction: column; align-items: stretch;} 
     .filter-group {width: 100%;} 
-    .date-range-group { flex-direction: column; flex: 1 1 100%;} /* Ensure date range also stacks on small screens */
+    .date-range-group { flex-direction: column; flex: 1 1 100%;} 
     .date-range-group > div {width: 100%;} 
     .calc-history-fs {height: 70px; min-height: 70px; font-size: 0.85em;} 
     .calculator-display-area { padding: 5px 15px 8px 15px; }
@@ -307,4 +348,10 @@ hr.section-divider {
     .calc-result-display-fs { font-size: 1.3em; height: 28px; line-height: 28px; min-height: 28px; } 
     .calc-history-fs {height: 60px; min-height: 60px; font-size: 0.8em; } 
     .calculator-display-area { padding: 3px 12px 5px 12px; }
+
+    .app-header h1 { font-size: 1.3em; }
+    .header-user-info { gap: 8px; }
+    .live-clock { font-size: 0.9em; padding: 5px 8px;}
+    #logoutButton.btn.btn-small { font-size: 0.75em; padding: 6px 8px; }
+    #userDisplayName { display: none; /* Hide name on very small screens if needed */ }
 }

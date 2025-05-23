@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>আমার হিসাব - লগইন</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="app.js" defer></script>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Registration Form -->
+    <form id="register-form" class="form">
+      <h1>অ্যাকাউন্ট তৈরি করুন</h1>
+      
+      <input type="text" id="register-name" placeholder="সম্পূর্ণ নাম" required />
+      
+      <input type="email" id="register-email" placeholder="ইমেইল অ্যাড্রেস" required />
+      
+      <input type="password" id="register-password" placeholder="পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)" required />
+      <small id="password-suggestions">
+        কমপক্ষে ৬টি অক্ষর ব্যবহার করুন, সাথে বড় হাতের অক্ষর, ছোট হাতের অক্ষর, সংখ্যা এবং বিশেষ চিহ্ন।
+      </small>
+      
+      <button type="submit">রেজিস্টার করুন</button>
+      
+      <p class="link-text">
+        ইতিমধ্যে অ্যাকাউন্ট আছে? <a href="#" id="show-login">এখানে লগইন করুন</a>
+      </p>
+    </form>
+
+    <!-- Login Form -->
+    <form id="login-form" class="form active">
+      <h1>লগইন করুন</h1>
+      
+      <input type="email" id="login-email" placeholder="ইমেইল অ্যাড্রেস" required />
+      
+      <input type="password" id="login-password" placeholder="পাসওয়ার্ড" required />
+      
+      <button type="submit">লগইন</button>
+      
+      <p class="link-text">
+        অ্যাকাউন্ট নেই? <a href="#" id="show-register">এখানে রেজিস্টার করুন</a>
+      </p>
+    </form>
+
+    <!-- Message Display -->
+    <div id="message" class="message"></div>
+  </div>
+</body>
+</html>

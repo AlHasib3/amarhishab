@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>আমার হিসাব</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="amar_hishab_style.css">
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
@@ -15,8 +15,14 @@
             <div class="header-title-section">
                 <h1><i class="fas fa-wallet"></i> আমার হিসাব</h1>
             </div>
-            <div id="liveClock" class="live-clock">
-                <i class="far fa-clock"></i> <span id="clockTime">00:00:00 AM</span>
+            <div class="header-user-info" style="display: flex; align-items: center; gap: 10px; margin-left: auto;">
+                <span id="userDisplayName" style="font-weight: 500; color: white; font-size: 0.9em;"></span>
+                 <div id="liveClock" class="live-clock" style="margin-left: 15px;">
+                    <i class="far fa-clock"></i> <span id="clockTime">00:00:00 AM</span>
+                </div>
+                <button id="logoutButton" class="btn btn-small" style="background-color: #e74c3c; color: white; border: none; padding: 8px 12px; font-size: 0.85em; line-height: 1.2;">
+                    <i class="fas fa-sign-out-alt"></i> লগআউট
+                </button>
             </div>
         </header>
 
@@ -314,6 +320,6 @@
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script type="module" src="amar_hishab_script.js"></script>
 </body>
 </html>
